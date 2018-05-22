@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>nl.netage.stardog</groupId>
-  <artifactId>describe</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+	<groupId>nl.netage.stardog</groupId>
+	<artifactId>describe</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-  <name>describe</name>
-  <url>http://maven.apache.org</url>
+	<name>describe</name>
+	<url>http://maven.apache.org</url>
 
 	<repositories>
 		<repository>
@@ -16,36 +16,41 @@
 			<url>http://maven.stardog.com</url>
 		</repository>
 	</repositories>
-	
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>com.complexible.stardog</groupId>
-    	<artifactId>stardog-api</artifactId>
-    	<version>5.2.2</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.complexible.stardog.core</groupId>
-    	<artifactId>stardog</artifactId>
-    	<version>5.2.2</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.complexible.stardog.utils</groupId>
-    	<artifactId>stardog-utils-openrdf</artifactId>
-    	<version>5.2.2</version>
-    </dependency>
-  </dependencies>
-  
-  <distributionManagement>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.complexible.stardog</groupId>
+			<artifactId>stardog-api</artifactId>
+			<version>5.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.complexible.stardog.core</groupId>
+			<artifactId>stardog</artifactId>
+			<version>5.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.complexible.stardog.utils</groupId>
+			<artifactId>stardog-utils-openrdf</artifactId>
+			<version>5.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>1.11.331</version>
+		</dependency>
+	</dependencies>
+
+	<distributionManagement>
 		<repository>
 			<id>nexus</id>
 			<name>Internal Releases</name>
@@ -57,5 +62,5 @@
 			<url>http://dev.netage.nl/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 </project>
