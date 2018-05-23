@@ -98,7 +98,7 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 	 */
 	@Override
 	public String toString() {
-		return "Describe(Example)";
+		return "Describe(NetageDescribeStrategy)";
 	}
 
 	@Override
