@@ -37,32 +37,31 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 		Dataset aDataset = ImmutableDataset.builder()
 				.namedGraphs(Iterables.concat(theDataset.getDefaultGraphs(), theDataset.getNamedGraphs()))
 				.build();
-		final GraphQueryResult aResults = theFactory.graph("construct {graph ?g { ?subject ?p ?object } } where { " +
-				"graph ?g { " +
-				"{ ?s ?p ?o . bind (?s as ?subject) bind(?o as ?object) } " +
-				"union " +
-				"{ ?o ?p ?s . bind (?o as ?subject) bind(?s as ?object) } } }",
+		
+		final GraphQueryResult aResults = theFactory.graph("CONSTRUCT {?s ?p ?o} WHERE { Graph ?g{"
+				+ "?s ?p ?o }}",                                                                                
 				Namespaces.STARDOG)
 				.dataset(aDataset)
 				.parameter("s", theValue)
 				.execute();
-
-		final GraphQueryResult bResults = theFactory.graph("CONSTRUCT {graph ?g {?o ?p2 ?o2}} WHERE {" 
-				+ "graph ?g {?s ?p ?o . " 
-				+ "?o ?p2 ?o2"
-				+ "filter(STRSTARTS(str(?o),str(?s)}}",                                                                                
+		
+		final GraphQueryResult bResults = theFactory.graph("CONSTRUCT {?nO ?nP ?o3} WHERE { Graph ?g{"
+				+ "?s ?p ?sO ."
+				+ "?s ?p2 ?nO ."
+				+ "?nO ?nP ?o3 ."
+				+ "filter(STRSTARTS(str(?nO),?subjectString))}}",                                                                                
 				Namespaces.STARDOG)
 				.dataset(aDataset)
 				.parameter("s", theValue)
+				.parameter("subjectString", theValue.stringValue()+"#")
 				.execute();
 
 		CloseableIterator<Statement> aResultsIter = new CloseableIterator.AbstractCloseableIterator<Statement>() {
-
 			public void close() {
 				aResults.close();
 			}
 
-
+			@Override
 			protected Statement computeNext() {
 				if (aResults.hasNext()) {
 					return aResults.next();
@@ -71,13 +70,13 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 				return endOfData();
 			}
 		};
-
+		
 		CloseableIterator<Statement> bResultsIter = new CloseableIterator.AbstractCloseableIterator<Statement>() {
 			public void close() {
 				bResults.close();
 			}
 
-
+			@Override
 			protected Statement computeNext() {
 				if (bResults.hasNext()) {
 					return bResults.next();
@@ -91,7 +90,7 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 	}
 
 	public String getName() {
-		return "Example";
+		return "NetageDescribeStrategy";
 	}
 
 	/**
