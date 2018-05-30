@@ -45,9 +45,8 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 				.parameter("s", theValue)
 				.execute();
 		
-		final GraphQueryResult bResults = theFactory.graph("CONSTRUCT {?nO ?nP ?o3} WHERE { Graph ?g{"
-				+ "?s ?p ?sO ."
-				+ "?s ?p2 ?nO ."
+		final GraphQueryResult hashResults = theFactory.graph("CONSTRUCT {?nO ?nP ?o3} WHERE { Graph ?g{"
+				+ "?s ?p ?nO ."
 				+ "?nO ?nP ?o3 ."
 				+ "filter(STRSTARTS(str(?nO),?subjectString))}}",                                                                                
 				Namespaces.STARDOG)
@@ -55,7 +54,19 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 				.parameter("s", theValue)
 				.parameter("subjectString", theValue.stringValue()+"#")
 				.execute();
-
+		
+		final GraphQueryResult blankNodeResults = theFactory.graph("CONSTRUCT {?o3 ?p4 ?o4 } WHERE { Graph ?g {"
+				+ "?s ?p ?nO . "
+				+ "?nO ?nP ?o3 ."
+				+ "?o3 ?p4 ?o4 ."
+				+ "filter(STRSTARTS(str(?nO),?subjectString))"
+				+ "filter(isBlank(?o3))}}",                                                                                
+				Namespaces.STARDOG)
+				.dataset(aDataset)
+				.parameter("s", theValue)
+				.parameter("subjectString", theValue.stringValue()+"#")
+				.execute();
+		
 		CloseableIterator<Statement> aResultsIter = new CloseableIterator.AbstractCloseableIterator<Statement>() {
 			public void close() {
 				aResults.close();
@@ -73,20 +84,35 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 		
 		CloseableIterator<Statement> bResultsIter = new CloseableIterator.AbstractCloseableIterator<Statement>() {
 			public void close() {
-				bResults.close();
+				hashResults.close();
 			}
 
 			@Override
 			protected Statement computeNext() {
-				if (bResults.hasNext()) {
-					return bResults.next();
+				if (hashResults.hasNext()) {
+					return hashResults.next();
+				}
+
+				return endOfData();
+			}
+		};
+		
+		CloseableIterator<Statement> cResultsIter = new CloseableIterator.AbstractCloseableIterator<Statement>() {
+			public void close() {
+				blankNodeResults.close();
+			}
+
+			@Override
+			protected Statement computeNext() {
+				if (blankNodeResults.hasNext()) {
+					return blankNodeResults.next();
 				}
 
 				return endOfData();
 			}
 		};
 
-		return Streams.concat(Streams.stream(aResultsIter), Streams.stream(bResultsIter));
+		return Streams.concat(Streams.stream(aResultsIter), Streams.stream(bResultsIter), Streams.stream(cResultsIter));
 	}
 
 	public String getName() {
