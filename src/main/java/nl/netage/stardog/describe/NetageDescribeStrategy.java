@@ -38,8 +38,13 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 				.namedGraphs(Iterables.concat(theDataset.getDefaultGraphs(), theDataset.getNamedGraphs()))
 				.build();
 		
-		final GraphQueryResult aResults = theFactory.graph("CONSTRUCT {?s ?p ?o} WHERE { Graph ?g{"
-				+ "?s ?p ?o }}",                                                                                
+		final GraphQueryResult aResults = theFactory.graph("CONSTRUCT {?s ?p ?o ."
+				+ "?o ?p3 ?o3 ."
+				+ "} WHERE { Graph ?g {"
+				+ "?s ?p ?o ."
+				+ "OPTIONAL{?o ?p3 ?o3 ."
+				+ "filter(isBlank(?o))}	"
+				+ "}}",                                                                                
 				Namespaces.STARDOG)
 				.dataset(aDataset)
 				.parameter("s", theValue)
