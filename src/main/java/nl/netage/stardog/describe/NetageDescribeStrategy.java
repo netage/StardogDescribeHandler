@@ -1,9 +1,9 @@
 package nl.netage.stardog.describe;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.stream.Stream;
 
-import com.complexible.common.base.CloseableIterator;
 import com.complexible.common.base.Streams;
 import com.complexible.common.openrdf.query.ImmutableDataset;
 import com.complexible.common.rdf.model.Namespaces;
@@ -36,12 +36,17 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 		// It should be otherwise queries like DESCRIBE :A FROM :g don't make sense but one may want to
 		// describe resources matched in G1 based on information in G2.
 		
-		return Streams.stream(retrieveResults(theFactory, theDataset, theValue.stringValue()));
-		//return Streams.concat(Streams.stream(aResultsIter), Streams.stream(bResultsIter), Streams.stream(cResultsIter));
+		// build hashset
+		HashSet<Statement> collection = traverseResults(theFactory, theDataset, theValue.stringValue());
+		final Iterator<Statement> itr = collection.iterator();
+		
+		
+		return Streams.stream(itr);
+		
 	}
 	
-	private CloseableIterator<Statement> retrieveResults(final QueryFactory theFactory, final Dataset theDataset, final String theValue){
-		final CloseableIterator<Statement> streams;
+	HashSet<Statement> traverseResults(final QueryFactory theFactory, final Dataset theDataset, final String theValue){
+		HashSet<Statement> statements = new HashSet<Statement>();
 		
 		Dataset aDataset = ImmutableDataset.builder()
 				.namedGraphs(Iterables.concat(theDataset.getDefaultGraphs(), theDataset.getNamedGraphs()))
@@ -54,29 +59,18 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 				.parameter("s", theValue)
 				.execute();
 		
-		CloseableIterator<Statement> resultsIter = new CloseableIterator.AbstractCloseableIterator<Statement>() {
-			public void close() {
-				aResults.close();
+		while(aResults.hasNext())
+		{
+			Statement statement = aResults.next();
+			if(statement.getObject().stringValue().startsWith(BASE_SUBJECT+"#")){
+				statements.addAll( traverseResults(theFactory, theDataset, statement.getObject().stringValue()));
 			}
-
-			@Override
-			protected Statement computeNext() {
-				if (aResults.hasNext()) {
-					System.out.println(aResults.next().getObject().stringValue() + " - " + BASE_SUBJECT+"#");
-					if(aResults.next().getObject().stringValue().startsWith(BASE_SUBJECT+"#")){
-						streams = Streams.concat(streams,retrieveResults(theFactory, theDataset, aResults.next().getObject().stringValue()));
-					}
-
-					return aResults.next();
-				}
-
-				return endOfData();
-			}
-		};
-		
-		return Streams.stream(resultsIter);
+			statements.add(aResults.next());
+		}		
+		return statements;
+	
 	}
-
+	
 
 	public String getName() {
 		return "NetageDescribeStrategy";
