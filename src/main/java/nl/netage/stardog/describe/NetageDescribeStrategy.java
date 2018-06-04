@@ -66,7 +66,7 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 		while(aResults.hasNext())
 		{
 			Statement statement = aResults.next();
-			System.out.println("While next! ( " + statement.getSubject().stringValue() + " - " + statement.getPredicate().stringValue() + " - " + statement.getObject().stringValue() +")");
+			//System.out.println("While next! ( " + statement.getSubject().stringValue() + " - " + statement.getPredicate().stringValue() + " - " + statement.getObject().stringValue() +")");
 			if(statement.getObject().stringValue().startsWith(BASE_SUBJECT+"#")){	
 				statements.addAll(traverseResults(theFactory, theDataset, vfac.createIRI(statement.getObject().stringValue())));
 			}else{
