@@ -11,8 +11,11 @@ import com.complexible.stardog.plan.describe.DescribeStrategy;
 import com.complexible.stardog.query.QueryFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.SimpleValueFactory;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.GraphQueryResult;
 
@@ -23,7 +26,8 @@ import org.openrdf.query.GraphQueryResult;
  */
 public final class NetageDescribeStrategy implements DescribeStrategy {
 	static String BASE_SUBJECT = "";
-
+	ValueFactory vfac = SimpleValueFactory.getInstance();
+	
 	@SuppressWarnings("unchecked")
 	public Stream<Statement> describe(final QueryFactory theFactory, final Dataset theDataset, final Resource theValue) {
 		// This class can be simplified by extending SingleQueryDescribeStrategy but we're showing the full version
@@ -37,15 +41,15 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 		// describe resources matched in G1 based on information in G2.
 		
 		// build hashset
-		HashSet<Statement> collection = traverseResults(theFactory, theDataset, theValue.stringValue());
+		HashSet<Statement> collection = traverseResults(theFactory, theDataset, theValue);
+		System.out.println("Size: "+collection.size());
 		final Iterator<Statement> itr = collection.iterator();
-		
 		
 		return Streams.stream(itr);
 		
 	}
 	
-	HashSet<Statement> traverseResults(final QueryFactory theFactory, final Dataset theDataset, final String theValue){
+	HashSet<Statement> traverseResults(final QueryFactory theFactory, final Dataset theDataset, final Resource theValue){
 		HashSet<Statement> statements = new HashSet<Statement>();
 		
 		Dataset aDataset = ImmutableDataset.builder()
@@ -62,11 +66,15 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 		while(aResults.hasNext())
 		{
 			Statement statement = aResults.next();
-			if(statement.getObject().stringValue().startsWith(BASE_SUBJECT+"#")){
-				statements.addAll( traverseResults(theFactory, theDataset, statement.getObject().stringValue()));
+			System.out.println("While next! ( " + statement.getSubject().stringValue() + " - " + statement.getPredicate().stringValue() + " - " + statement.getObject().stringValue() +")");
+			if(statement.getObject().stringValue().startsWith(BASE_SUBJECT+"#")){	
+				statements.addAll(traverseResults(theFactory, theDataset, vfac.createIRI(statement.getObject().stringValue())));
+			}else{
+				statements.addAll(traverseResults(theFactory, theDataset, vfac.createBNode(statement.getObject().stringValue())));
 			}
-			statements.add(aResults.next());
+			statements.add(statement);
 		}		
+		//System.out.println("Size local: "+statements.size());
 		return statements;
 	
 	}
