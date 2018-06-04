@@ -42,7 +42,7 @@ public final class NetageDescribeStrategy implements DescribeStrategy {
 		
 		// build hashset
 		HashSet<Statement> collection = traverseResults(theFactory, theDataset, theValue);
-		System.out.println("Size: "+collection.size());
+		//System.out.println("Size: "+collection.size());
 		final Iterator<Statement> itr = collection.iterator();
 		
 		return Streams.stream(itr);
