@@ -2,3 +2,7 @@
 /.settings/
 /.project
 /.classpath
+/.idea
+*.iml
+*.ipr
+*.iws
